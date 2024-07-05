@@ -12,6 +12,7 @@ import java.time.Instant;
 
 @ControllerAdvice
 class GlobalRequestExceptionHandler extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler
     ProblemDetail problemDetailForConstraintViolationException(final ConstraintViolationException ex) {
         var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());

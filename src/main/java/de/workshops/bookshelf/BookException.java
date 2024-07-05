@@ -1,7 +1,7 @@
 package de.workshops.bookshelf;
 
-public class BookException extends RuntimeException{
-    public BookException(String message) {
+class BookException extends RuntimeException{
+    BookException(String message) {
         super(message);
     }
 }

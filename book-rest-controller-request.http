@@ -6,7 +6,7 @@ GET http://localhost:8080/book
 GET http://localhost:8080/book/{{isbn}}
 
 ###
-@author = Bi
+@author = Rob
 GET http://localhost:8080/book?
     author={{author}}
 
