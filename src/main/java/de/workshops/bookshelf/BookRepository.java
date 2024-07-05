@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class BookRepository {
+class BookRepository {
     private final ObjectMapper mapper;
     private final ResourceLoader resourceLoader;
 
     private List<Book> books;
 
-    public BookRepository(ObjectMapper mapper, ResourceLoader resourceLoader) {
+    BookRepository(ObjectMapper mapper, ResourceLoader resourceLoader) {
         this.mapper = mapper;
         this.resourceLoader = resourceLoader;
     }
