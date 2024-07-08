@@ -44,6 +44,12 @@ class BookRestController {
         return ResponseEntity.ok(searchResult);
     }
 
+    @PostMapping
+    Book createBook(@RequestBody @Valid Book book) {
+        var savedBook = bookService.createBook(book);
+        return savedBook;
+    }
+
     @ExceptionHandler
     ResponseEntity<String> handleBookException(BookException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);

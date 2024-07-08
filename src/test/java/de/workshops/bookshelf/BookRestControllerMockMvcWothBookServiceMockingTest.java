@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,8 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+//@SpringBootTest
+//@AutoConfigureMockMvc
+@WebMvcTest
 class BookRestControllerMockMvcWothBookServiceMockingTest {
 
     @Autowired
@@ -95,5 +95,39 @@ class BookRestControllerMockMvcWothBookServiceMockingTest {
         List<Book> allBooks = objectMapper.readValue(jsonPayload, new TypeReference<>() {});
 
         assertThat(allBooks).hasSize(2);
+    }
+
+    @Test
+    void createBook_expect_OK() throws Exception {
+        String isbn = "111-1111111111";
+        String author = "Birgit Kratz";
+        String title = "My first book";
+        String description = "It's just genious.";
+
+        var expectedBook = new Book();
+        expectedBook.setIsbn(isbn);
+        expectedBook.setAuthor(author);
+        expectedBook.setTitle(title);
+        expectedBook.setDescription(description);
+
+        when(mockedBookService.createBook(any(Book.class))).thenReturn(expectedBook);
+
+        var response = mockMvc.perform(post("/book")
+                        .content("""
+                                {
+                                    "isbn": "%s",
+                                    "title": "%s",
+                                    "author": "%s",
+                                    "description": "%s"
+                                }""".formatted(isbn, title, author, description))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var jsonPayload = response.getResponse().getContentAsString();
+
+        Book createdBook = objectMapper.readValue(jsonPayload, new TypeReference<>() {});
+
+        assertThat(createdBook).isNotNull();
     }
 }

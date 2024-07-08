@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -17,8 +17,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//@AutoConfigureMockMvc
+@WebMvcTest(BookRestController.class)
+@Import({BookService.class, BookRepository.class})
 class BookRestControllerMockMvcTest {
 
     @Autowired
@@ -26,6 +28,9 @@ class BookRestControllerMockMvcTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+//    @LocalServerPort
+//    int port;
 
     @Test
     void getAllBooks() throws Exception {
@@ -37,7 +42,7 @@ class BookRestControllerMockMvcTest {
 
         List<Book> allBooks = objectMapper.readValue(jsonPayload, new TypeReference<>() {});
 
-        assertThat(allBooks).hasSize(3);
+        assertThat(allBooks).hasSizeGreaterThanOrEqualTo(3);
     }
 
     @Test
@@ -88,4 +93,38 @@ class BookRestControllerMockMvcTest {
 
         assertThat(allBooks).hasSize(2);
     }
+
+    @Test
+    void createBook_expect_OK() throws Exception {
+        String isbn = "111-1111111111";
+        String author = "Birgit Kratz";
+        String title = "My first book";
+        String description = "It's just genious.";
+
+        var expectedBook = new Book();
+        expectedBook.setIsbn(isbn);
+        expectedBook.setAuthor(author);
+        expectedBook.setTitle(title);
+        expectedBook.setDescription(description);
+
+        var response = mockMvc.perform(post("/book")
+                        .content("""
+                                {
+                                    "isbn": "%s",
+                                    "title": "%s",
+                                    "author": "%s",
+                                    "description": "%s"
+                                }""".formatted(isbn, title, author, description))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var jsonPayload = response.getResponse().getContentAsString();
+
+        Book createdBook = objectMapper.readValue(jsonPayload, new TypeReference<>() {});
+
+        assertThat(createdBook).isNotNull();
+        assertThat(createdBook).isEqualTo(expectedBook);
+    }
+
 }

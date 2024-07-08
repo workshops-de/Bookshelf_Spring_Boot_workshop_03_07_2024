@@ -30,4 +30,8 @@ class BookRepository {
         return books;
     }
 
+    Book saveBook(Book book) {
+        books.add(book);
+        return book;
+    }
 }
