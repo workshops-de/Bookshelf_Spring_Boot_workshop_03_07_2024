@@ -18,3 +18,14 @@ Content-Type: application/json
   "author": "Birgit",
   "isbn": "978-3836211160"
 }
+
+###
+POST http://localhost:8080/book
+Content-Type: application/json
+
+{
+  "isbn": "222-2222222222",
+  "title": "My first book",
+  "author": "Birgit Kratz",
+  "description": "it's just genial"
+}

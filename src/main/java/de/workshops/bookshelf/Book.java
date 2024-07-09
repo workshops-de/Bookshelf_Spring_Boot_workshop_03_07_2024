@@ -1,12 +1,34 @@
 package de.workshops.bookshelf;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.util.Objects;
 
+@Entity
+@NamedQueries({
+        @NamedQuery(name = "Book.searchBooksByDescription",
+        query = "select b from Book b where description like :descr")
+})
 class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
+    private Long id;
     private String title;
+
+    @Column(length = 1000)
     private String description;
     private String author;
     private String isbn;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -45,12 +67,12 @@ class Book {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return Objects.equals(title, book.title) && Objects.equals(description, book.description) && Objects.equals(author, book.author) && Objects.equals(isbn, book.isbn);
+        return Objects.equals(id, book.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, description, author, isbn);
+        return Objects.hash(id);
     }
 
     @Override

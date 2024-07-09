@@ -1,6 +1,29 @@
 application:
   title: @project.name@
   version: @project.version@
+  license:
+    name: MIT-License
+    link: https://opensource.org/licenses/MIT
 springdoc:
   api-docs:
-    enabled: false
+    enabled: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bookshelf
+    driver-class-name: org.postgresql.Driver
+    username: user
+    password: password
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    generate-ddl: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  h2:
+    console:
+      enabled: true
+  sql:
+    init:
+      mode: always
