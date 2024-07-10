@@ -40,7 +40,6 @@ class BookService {
         return searchResult;
     }
 
-
     Book createBook(Book book) {
         return bookRepository.saveBook(book);
     }

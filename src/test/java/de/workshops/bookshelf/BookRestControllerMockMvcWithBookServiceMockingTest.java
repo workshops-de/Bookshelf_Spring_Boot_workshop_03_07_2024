@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -24,7 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@SpringBootTest
 //@AutoConfigureMockMvc
 @WebMvcTest
-class BookRestControllerMockMvcWothBookServiceMockingTest {
+@WithMockUser
+class BookRestControllerMockMvcWithBookServiceMockingTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -85,6 +88,7 @@ class BookRestControllerMockMvcWothBookServiceMockingTest {
                                   "author": "Rob",
                                   "isbn": "978-3836211161"
                                 }""")
+                        .with(csrf())
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
@@ -98,6 +102,7 @@ class BookRestControllerMockMvcWothBookServiceMockingTest {
     }
 
     @Test
+    @WithMockUser(roles = {"ADMIN"})
     void createBook_expect_OK() throws Exception {
         String isbn = "111-1111111111";
         String author = "Birgit Kratz";
@@ -120,7 +125,9 @@ class BookRestControllerMockMvcWothBookServiceMockingTest {
                                     "author": "%s",
                                     "description": "%s"
                                 }""".formatted(isbn, title, author, description))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                )
                 .andExpect(status().isOk())
                 .andReturn();
 

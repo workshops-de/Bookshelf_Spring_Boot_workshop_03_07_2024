@@ -11,8 +11,8 @@ public interface BookJpaRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByAuthorOrDescriptionContaining(String author, String description);
 
-    // JPQL Quere
-    @Query("select b from Book b where b.author = ?1 or b.isbn like ?2")
+    // JPQL Query
+    @Query("select b from Book b where b.author = ?1 or b.isbn like '%?2%'")
     List<Book> searchBook(String author, String isbn);
 
     // here the named query from Book class will be used

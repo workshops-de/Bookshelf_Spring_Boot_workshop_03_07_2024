@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@WebMvcTest(controllers = BookRestController.class)
 //@Import({BookService.class, BookRepository.class})
 @ActiveProfiles("test")
+@WithMockUser
 class BookRestControllerMockMvcTest {
 
     @Autowired
@@ -84,6 +87,7 @@ class BookRestControllerMockMvcTest {
                                   "author": "Rob",
                                   "isbn": "978-3836211161"
                                 }""")
+                        .with(csrf())
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
@@ -97,6 +101,27 @@ class BookRestControllerMockMvcTest {
     }
 
     @Test
+    @WithMockUser(roles = {"USER"})
+    void createBook_expect_Forbidden() throws Exception {
+        String isbn = "111-1111111111";
+        String author = "Birgit Kratz";
+        String title = "My first book";
+        String description = "It's just genious.";
+
+        mockMvc.perform(post("/book")
+                        .content("""
+                                {
+                                    "isbn": "%s",
+                                    "title": "%s",
+                                    "author": "%s",
+                                    "description": "%s"
+                                }""".formatted(isbn, title, author, description))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
     void createBook_expect_OK() throws Exception {
         String isbn = "111-1111111111";
         String author = "Birgit Kratz";
